@@ -84,10 +84,10 @@ func (p *libreOfficeProcess) Start(logger *zap.Logger) error {
 
 	// For whatever reason, LibreOffice requires a first start before being
 	// able to run as a daemon.
-	exitCode, err := cmd.Exec()
-	if err != nil && exitCode != 81 {
-		return fmt.Errorf("execute LibreOffice: %w", err)
-	}
+	//exitCode, err := cmd.Exec()
+	//if err != nil && exitCode != 81 {
+	//	return fmt.Errorf("execute LibreOffice: %w", err)
+	//}
 
 	logger.Debug("got exit code 81, e.g., LibreOffice first start")
 

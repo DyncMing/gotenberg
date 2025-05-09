@@ -40,7 +40,7 @@ func Run() {
 
 	// Create the root FlagSet and adds the modules flags to it.
 	fs := flag.NewFlagSet("gotenberg", flag.ExitOnError)
-	fs.Duration("gotenberg-graceful-shutdown-duration", time.Duration(30)*time.Second, "Set the graceful shutdown duration")
+	fs.Duration("gotenberg-graceful-shutdown-duration", time.Duration(300)*time.Second, "Set the graceful shutdown duration")
 
 	descriptors := gotenberg.GetModuleDescriptors()
 	var modsInfo string
