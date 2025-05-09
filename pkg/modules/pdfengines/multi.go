@@ -74,16 +74,14 @@ func (multi *multiPdfEngines) Split(ctx context.Context, logger *zap.Logger, mod
 	var err error
 	var mu sync.Mutex // to safely append errors.
 
-	resultChan := make(chan splitResult, len(multi.splitEngines))
-
 	for _, engine := range multi.splitEngines {
+		resultChan := make(chan splitResult, 1)
+
 		go func(engine gotenberg.PdfEngine) {
 			outputPaths, err := engine.Split(ctx, logger, mode, inputPath, outputDirPath)
 			resultChan <- splitResult{outputPaths: outputPaths, err: err}
 		}(engine)
-	}
 
-	for range multi.splitEngines {
 		select {
 		case result := <-resultChan:
 			if result.err != nil {
@@ -126,7 +124,7 @@ func (multi *multiPdfEngines) Flatten(ctx context.Context, logger *zap.Logger, i
 	return fmt.Errorf("flatten PDF with multi PDF engines: %w", err)
 }
 
-// Convert converts the given PDF to a specific PDF format. thanks to its
+// Convert converts the given PDF to a specific PDF format, thanks to its
 // children. If the context is done, it stops and returns an error.
 func (multi *multiPdfEngines) Convert(ctx context.Context, logger *zap.Logger, formats gotenberg.PdfFormats, inputPath, outputPath string) error {
 	var err error
@@ -160,16 +158,14 @@ func (multi *multiPdfEngines) ReadMetadata(ctx context.Context, logger *zap.Logg
 	var err error
 	var mu sync.Mutex // to safely append errors.
 
-	resultChan := make(chan readMetadataResult, len(multi.readMetadataEngines))
-
 	for _, engine := range multi.readMetadataEngines {
+		resultChan := make(chan readMetadataResult, 1)
+
 		go func(engine gotenberg.PdfEngine) {
 			metadata, err := engine.ReadMetadata(ctx, logger, inputPath)
 			resultChan <- readMetadataResult{metadata: metadata, err: err}
 		}(engine)
-	}
 
-	for range multi.readMetadataEngines {
 		select {
 		case result := <-resultChan:
 			if result.err != nil {

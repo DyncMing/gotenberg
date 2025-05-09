@@ -51,6 +51,7 @@ func (mod *PdfEngines) Descriptor() gotenberg.ModuleDescriptor {
 			fs.StringSlice("pdfengines-write-metadata-engines", []string{"exiftool"}, "Set the PDF engines and their order for the write metadata feature - empty means all")
 			fs.Bool("pdfengines-disable-routes", false, "Disable the routes")
 
+			// Deprecated flags.
 			fs.StringSlice("pdfengines-engines", make([]string, 0), "Set the default PDF engines and their default order - all by default")
 			err := fs.MarkDeprecated("pdfengines-engines", "use other flags for a more granular selection of PDF engines per method")
 			if err != nil {
@@ -91,7 +92,7 @@ func (mod *PdfEngines) Provision(ctx *gotenberg.Context) error {
 		defaultNames[i] = engine.(gotenberg.Module).Descriptor().ID
 	}
 
-	// Example in case of deprecated module name.
+	// Example in the case of deprecated module name.
 	//for i, name := range defaultNames {
 	//	if name == "unoconv-pdfengine" || name == "uno-pdfengine" {
 	//		logger.Warn(fmt.Sprintf("%s is deprecated; prefer libreoffice-pdfengine instead", name))

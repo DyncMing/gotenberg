@@ -200,7 +200,7 @@ func (p *libreOfficeProcess) Stop(logger *zap.Logger) error {
 				logger.Debug(fmt.Sprintf("'%s' LibreOffice's user profile directory removed", userProfileDirPath))
 			}
 
-			// Also remove LibreOffice specific files in the temporary directory.
+			// Also, remove LibreOffice specific files in the temporary directory.
 			err = gotenberg.GarbageCollect(logger, os.TempDir(), []string{"OSL_PIPE", ".tmp"}, expirationTime)
 			if err != nil {
 				logger.Error(err.Error())
@@ -275,8 +275,13 @@ func (p *libreOfficeProcess) pdf(ctx context.Context, logger *zap.Logger, inputP
 		args = append(args, "--printer", "PaperOrientation=landscape")
 	}
 
+	// See: https://github.com/gotenberg/gotenberg/issues/1149.
 	if options.PageRanges != "" {
 		args = append(args, "--export", fmt.Sprintf("PageRange=%s", options.PageRanges))
+	}
+
+	if !options.UpdateIndexes {
+		args = append(args, "--disable-update-indexes")
 	}
 
 	args = append(args, "--export", fmt.Sprintf("ExportFormFields=%t", options.ExportFormFields))
@@ -348,10 +353,10 @@ func (p *libreOfficeProcess) pdf(ctx context.Context, logger *zap.Logger, inputP
 	}
 
 	// LibreOffice's errors are not explicit.
-	// For instance, an exit code 5 may be explained by a malformed page
-	// ranges, but also by a not required password.
+	// For instance, exit code 5 may be explained by a malformed page range
+	// but also by a not required password.
 
-	// We may want to retry in case of a core dumped event.
+	// We may want to retry in case of a core-dumped event.
 	// See https://github.com/gotenberg/gotenberg/issues/639.
 	if strings.Contains(err.Error(), "core dumped") {
 		return ErrCoreDumped
